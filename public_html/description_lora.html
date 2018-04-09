@@ -1,0 +1,289 @@
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+        <!-- 
+        <link href="css/normalize.css" rel="stylesheet" type="text/css"/>
+        NORMALIZE: IS THAT NECESSARY????
+        -->
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <style>
+            body {
+                padding-top: 50px;
+                padding-bottom: 20px;
+            }
+        </style>
+        <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="css/main.css">
+
+        <script src="js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> 
+            browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Carlos Cavalcante</a>
+          <p><h4>Internet of Things Specialist</h4></p>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <form class="navbar-form navbar-right" role="form">
+            <div class="form-group">
+              <input type="text" placeholder="Email" class="form-control">
+            </div>
+            <div class="form-group">
+              <input type="password" placeholder="Password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-success">Sign in</button>
+          </form>
+        </div><!--/.navbar-collapse -->
+      </div>
+
+        <div id = "index_nav">
+            <nav>
+                <ul class="inline">
+                    <li><a href="index.html">home</a></li>
+                    <li><a href="projects.html">projects</a></li>
+                    <li><a href="blog.html">blog</a></li>
+                    <li><a href="contact.html">contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </nav>
+
+        <div id="wrap"><h1>Link chain radio LORA with Arduino - Client side</h1>
+            <div>
+                <h2>Objectif</h2>
+                <p>Connecter un module radio LORA dragino avec une carte arduino et évaluer les modes d’émission et de réception.</p>
+
+                <h2>Préliminaire</h2>
+                    <p>Disposer des composantes nécessaires</p>
+                    <ol id="description"><em><strong>
+                        <h2>Module radio :</h2> 
+                        <li>Placer le module sur votre carte arduino. Procéder à l’alimentation du circuit en mode client.</li>
+                        <li>Vérifier que le la librarie RadioHead est chargé au niveau de votre IDE Arduino. On ouvrira ensuite le fichier RH_RF95.cpp qui se trouve de votre installation (voir possiblement \Documents\Arduino\libraries\RadioHead)
+                        </li>
+                        <li>Modifier la ligne 187 ou faire une recherche pour la fonction setFrequency. Ajuster la valeur de 433.0 vers 915.0 comme le montre la figure suivante :
+                        </li>
+                        <li>La valeur choisie correspond à la fréquence LORA US/Amérique du nord
+                        </li>
+                        <li>Lancer votre IDE pour Arduino et utiliser le code suivant pour le client (que vous pouvez aussi retrouver au niveau de la section –Examples- du menu 
+                        </li>
+                    </strong></em></ol>
+            </div>
+            <div>
+                
+                <p>// rf95_client.pde</p>
+                <p>// -*- mode: C++ -*-</p>
+                <p>// Example sketch showing how to create a simple messageing client</p>
+                <p>// with the RH_RF95 class. RH_RF95 class does not provide for addressing or</p>
+                <p>// reliability, so you should only use RH_RF95 if you do not need the higher</p>
+                <p>// level messaging abilities.</p>
+                <p>// It is designed to work with the other example rf95_server</p>
+                <p>// Tested with Anarduino MiniWirelessLoRa, Rocket Scream Mini Ultra Pro with</p>
+                <p>// the RFM95W, Adafruit Feather M0 with RFM95</p>
+
+                <p>#include <SPI.h></p>
+                <p>#include <RH_RF95.h></p>
+
+                <p>// Singleton instance of the radio driver</p>
+                <p>RH_RF95 rf95;</p>
+                <p>//RH_RF95 rf95(5, 2); // Rocket Scream Mini Ultra Pro with the RFM95W</p>
+                <p>//RH_RF95 rf95(8, 3); // Adafruit Feather M0 with RFM95 </p>
+
+                <p>// Need this on Arduino Zero with SerialUSB port (eg RocketScream Mini Ultra Pro)</p>
+                <p>//#define Serial SerialUSB</p>
+
+                <p>void setup() </p>
+                <p>{</p>
+                <p>// Rocket Scream Mini Ultra Pro with the RFM95W only:</p>
+                <p>// Ensure serial flash is not interfering with radio communication on SPI bus</p>
+                <p>//  pinMode(4, OUTPUT);</p>
+                <p>//  digitalWrite(4, HIGH);</p>
+
+                <p> Serial.begin(9600);</p>
+                <p> while (!Serial) ; // Wait for serial port to be available</p>
+                <p> if (!rf95.init())</p>
+                <p>  Serial.println("init failed");</p>
+                <p> // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on</p>
+
+                <p>// The default transmitter power is 13dBm, using PA_BOOST.</p>
+                <p>// If you are using RFM95/96/97/98 modules which uses the PA_BOOST transmitter pin, then </p>
+                <p>// you can set transmitter powers from 5 to 23 dBm:</p>
+                <p>rf95.setTxPower(23, true);</p>
+                <p>// If you are using Modtronix inAir4 or inAir9,or any other module which uses the</p>
+                <p>// transmitter RFO pins and not the PA_BOOST pins</p>
+                <p>// then you can configure the power transmitter power for -1 to 14 dBm and with useRFO true. </p>
+                <p>// Failure to do that will result in extremely low transmit powers.</p>
+                <p>//  driver.setTxPower(14, true);
+                <p>}</p>
+
+                <p>void loop()</p>
+                <p>{</p>
+                <p> Serial.println("Sending to rf95_server");</p>
+                <p> // Send a message to rf95_server</p>
+                <p>uint8_t data[] = "Hello World!";</p>
+                <p> rf95.send(data, sizeof(data));</p>
+
+                <p>rf95.waitPacketSent();</p>
+                <p>// Now wait for a reply</p>
+                <p>uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];</p>
+                <p>uint8_t len = sizeof(buf);</p>
+
+                <p>if (rf95.waitAvailableTimeout(1000))</p>
+                <p>{ </p>
+                <p> // Should be a reply message for us now</p>   
+                <p> if (rf95.recv(buf, &len))</p>
+                <p>  {</p>
+                <p>     Serial.print("got reply: ");</p>
+                <p>    Serial.println((char*)buf);</p>
+                <p>//      Serial.print("RSSI: ");</p>
+                <p>//      Serial.println(rf95.lastRssi(), DEC);    </p>
+                <p>}</p>
+                <p>else</p>
+                <p>{</p>
+                <p>  Serial.println("recv failed");</p>
+                <p> }</p>
+                <p> }</p>
+                <p> else</p>
+                <p>{</p>
+                <p> Serial.println("No reply, is rf95_server running?");</p>
+                <p>}
+                <p>delay(400);</p>
+                <p>}</p>
+
+                <h2>Partie 2: Collecte et transmission de données à travers un réseau LORA </h2>
+                <h2>Objectif</h2>
+                
+                <h3>Procéder à la collecte de données température et envoi à travers une chaine de liaison LORA</h3>
+                
+                <h3>Préliminaire</h3>
+                <ul>Disposer des composantes nécessaires pour le laboratoire</ul>
+                <ul>Le module client fonctionne </ul>
+
+                <h3>Démarche</h3>
+                <ul>
+                    <li>On utilisera un des deux composants suivants DHT11 pour collecter la température et l'humidité. Au niveau de la connexion, on fera attention à utiliser les pattes appropriées.</li>
+                    <img src="img/pic/dht11.jpg" alt=""/>
+                    <li>Mettre en place le circuit suivant (en faisant attention à placer en premier le HAT dragino)</li>
+                    <img src="img/pic/dht11_arduino.jpg" alt=""/>
+                    <p>Ajouter le code suivant au niveau de l'IDE</p>
+                    <p></p>
+                    <p>#include <dht.h></p>
+                    <p>dht DHT;</p>
+                    <p>#define DHT11_PIN 3</p>
+                    <p>void setup(){</p>
+                    <p>Serial.begin(9600);</p>
+                    <p>}</p>
+                    <p>void loop()</p>
+                    <p>{</p>
+                    <p>int chk = DHT.read11(DHT11_PIN);</p>
+                    <p>Serial.print("Temperature = ");</p>
+                    <p>Serial.println(DHT.temperature);</p>
+                    <p>Serial.print("Humidity = ");</p>
+                    <p>Serial.println(DHT.humidity);</p>
+                    <p>delay(1000);</p>
+                    <p>}</p>
+                    <p>4.	Lancer le moniteur du port série au niveau de l'IDE Arduino et verifier l'affichage des valeurs.</p>
+                    <p>5.	Maintenant, on modifie le code pour avoir l’envoi vers un serveur LORA.</p>
+                    <p>#include <dht.h></p>
+                    <p>// Singleton instance of the radio driver</p>
+                    <p>#include <SPI.h></p>
+                    <p>#include <RH_RF95.h></p>
+                    <p>RH_RF95 rf95;</p>
+                    <p>dht DHT;</p>
+                    <p>#define DHT11_PIN 3</p>
+                    <p>float data;</p>
+                    <p>String datastring="";</p>
+                    <p>char databuf[10];</p>
+                    <p>uint8_t dataoutgoing[10];</p>
+                    <p>void setup() </p>
+                    <p>{</p>
+                    <p>Serial.begin(9600);</p>
+                    <p>if (!rf95.init())</p>
+                    <p>Serial.println("init failed");</p>
+                    <p>}</p>
+
+                    <p>void loop()</p>
+                    <p>{</p>
+                    <p>// Print Sending to rf95_server</p>
+                    <p>Serial.println("Sending to rf95_server");</p>
+                    <p>// Get the temperature and send the message to rf95_server</p>
+                    <p>int chk = DHT.read11(DHT11_PIN);</p>
+                    <p>Serial.print("Temperature = ");</p>
+                    <p>Serial.println(DHT.temperature);</p>
+                    <p>Serial.print("Humidity = ");</p>
+                    <p>Serial.println(DHT.humidity);</p>
+
+                    <p>data = DHT.temperature;</p>
+                    <p>datastring +=dtostrf(data, 4, 2, databuf);</p>
+                    <p> strcpy((char *)dataoutgoing,databuf);</p>
+                    <p>Serial.println(databuf);</p>
+                    <p>rf95.send(dataoutgoing, sizeof(dataoutgoing));</p>
+                    <p>rf95.waitPacketSent();</p>
+                    <p>// Now wait for a reply</p>
+                    <p>uint8_t indatabuf[RH_RF95_MAX_MESSAGE_LEN];</p>
+                    <p> uint8_t len = sizeof(indatabuf);</p>
+                    <p>if (rf95.waitAvailableTimeout(3000))</p>
+                    <p>{ </p>
+                    <p>// Should be a reply message for us now   </p>
+                    <p>if (rf95.recv(indatabuf, &len))</p>
+                    <p>{</p>
+                    <p>// Serial print "got reply:" and the reply message from the server</p>
+                    <p>Serial.print("got reply: ");</p>
+                    <p>Serial.println((char*)indatabuf);</p>
+                    <p>}</p>
+                    <p>else</p>
+                    <p>{</p>
+                    <p>//</p>
+                    <p>Serial.println("recv failed");</p>
+                    <p>}</p>
+                    <p>}</p>
+                    <p>else</p>
+                    <p>{</p>
+                    <p>// Serial print "No reply, is rf95_server running?" if don't get the reply .</p>
+                    <p>Serial.println("No reply, is rf95_server running?");</p>
+                    <p>}</p>
+                    <p>delay(4000);</p>
+                    <p>}</p>
+
+                </ul>
+                
+
+                
+            </div>
+
+      <footer>
+        <p>&copy; 2015 - Carlos Cavalcante - Internet of Things</p>
+      </footer>
+         </div><!-- /container -->        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
+
+        <script src="js/vendor/bootstrap.min.js"></script>
+
+        <script src="js/main.js"></script>
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='//www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-XXXXX-X','auto');ga('send','pageview');
+        </script>
+    </body>
+</html>
